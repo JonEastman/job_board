@@ -3,6 +3,8 @@
 namespace App\Entity;
 
 use App\Repository\JobRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
@@ -52,6 +54,14 @@ class Job
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
+
+    #[ORM\OneToMany(targetEntity: Application::class, mappedBy: 'job', orphanRemoval: true)]
+    private Collection $applications;
+
+    public function __construct()
+    {
+        $this->applications = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -210,6 +220,36 @@ class Job
     public function setUpdatedAt(\DateTimeInterface $updatedAt): static
     {
         $this->updatedAt = $updatedAt;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Application>
+     */
+    public function getApplications(): Collection
+    {
+        return $this->applications;
+    }
+
+    public function addApplication(Application $application): static
+    {
+        if (!$this->applications->contains($application)) {
+            $this->applications->add($application);
+            $application->setJob($this);
+        }
+
+        return $this;
+    }
+
+    public function removeApplication(Application $application): static
+    {
+        if ($this->applications->removeElement($application)) {
+            // set the owning side to null (unless already changed)
+            if ($application->getJob() === $this) {
+                $application->setJob(null);
+            }
+        }
 
         return $this;
     }
