@@ -11,6 +11,10 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: JobRepository::class)]
 class Job
 {
+    const STATUS_DRAFT = 'draft';
+    const STATUS_LIVE = 'live';
+    const STATUS_ENDED = 'ended';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
@@ -47,7 +51,7 @@ class Job
     private ?string $description = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    private ?string $status = null;
+    private ?string $status = self::STATUS_DRAFT;
 
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $createdAt = null;
@@ -58,9 +62,14 @@ class Job
     #[ORM\OneToMany(targetEntity: Application::class, mappedBy: 'job', orphanRemoval: true)]
     private Collection $applications;
 
-    public function __construct()
+    #[ORM\ManyToOne(inversedBy: 'jobs')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?Company $company = null;
+
+    public function __construct(Company $company)
     {
         $this->applications = new ArrayCollection();
+        $this->company = $company;
     }
 
     public function getId(): ?int
@@ -250,6 +259,18 @@ class Job
                 $application->setJob(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
 
         return $this;
     }

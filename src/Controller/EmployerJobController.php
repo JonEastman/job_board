@@ -4,9 +4,13 @@ namespace App\Controller;
 
 use App\Entity\Application;
 use App\Entity\Job;
+use App\Entity\User;
+use App\Form\JobType;
 use App\Service\ApplicationManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -23,9 +27,34 @@ class EmployerJobController extends AbstractController
     }
 
     #[Route('/employer/jobs/new', name: 'app_employer_new_job')]
-    public function new(): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
-        $form = null;
+        /** @var User $user */
+        $user = $this->getUser();
+        $company = $user->getCompany();
+        if (!$company) {
+
+            $this->addFlash('error', 'Cannot create a new job without a company');
+
+            return $this->redirectToRoute('app_employer_dashboard');
+        }
+
+        $job = new Job($company);
+
+        $form = $this->createForm(JobType::class, $job);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $entityManager->persist($job);
+            $entityManager->flush();
+
+            $this->addFlash('success', 'New job has been created');
+
+            return $this->redirectToRoute('app_employer_view_job', [
+                'id' => $job->getId()
+            ]);
+        }
 
         return $this->render('employer_job/new.html.twig', [
             'form' => $form, // ->createView()
@@ -43,15 +72,27 @@ class EmployerJobController extends AbstractController
     }
 
     #[Route('/employer/jobs/{id}/edit', name: 'app_employer_edit_job')]
-    public function edit(Job $job): Response
+    public function edit(Job $job, Request $request, EntityManagerInterface $entityManager): Response
     {
         // Todo Add User / Employer Validation / Security
 
-        $form = null;
+        $form = $this->createForm(JobType::class, $job);
+
+        $form->handleRequest($request);
+        if ($form->isSubmitted() && $form->isValid()) {
+
+            $entityManager->flush();
+
+            $this->addFlash('success', 'Job has been edited');
+
+            return $this->redirectToRoute('app_employer_view_job', [
+                'id' => $job->getId()
+            ]);
+        }
 
         return $this->render('employer_job/edit.html.twig', [
             'job' => $job,
-            'form' => $form, // ->createView()
+            'form' => $form->createView(),
         ]);
     }
 
@@ -60,7 +101,7 @@ class EmployerJobController extends AbstractController
     {
         // Todo Add User / Employer Validation / Security
 
-        $applications = [];
+        $applications = $job->getApplications();
 
         return $this->render('employer_job/applications.html.twig', [
             'job' => $job,

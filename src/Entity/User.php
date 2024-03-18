@@ -67,9 +67,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\OneToMany(targetEntity: Application::class, mappedBy: 'applicant', orphanRemoval: true)]
     private Collection $applications;
 
+    #[ORM\ManyToOne(inversedBy: 'users')]
+    private ?Company $company = null;
+
+    #[ORM\ManyToMany(targetEntity: Job::class)]
+    private Collection $favorites;
+
     public function __construct()
     {
         $this->applications = new ArrayCollection();
+        $this->favorites = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -281,6 +288,42 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $application->setApplicant(null);
             }
         }
+
+        return $this;
+    }
+
+    public function getCompany(): ?Company
+    {
+        return $this->company;
+    }
+
+    public function setCompany(?Company $company): static
+    {
+        $this->company = $company;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Job>
+     */
+    public function getFavorites(): Collection
+    {
+        return $this->favorites;
+    }
+
+    public function addFavorite(Job $favorite): static
+    {
+        if (!$this->favorites->contains($favorite)) {
+            $this->favorites->add($favorite);
+        }
+
+        return $this;
+    }
+
+    public function removeFavorite(Job $favorite): static
+    {
+        $this->favorites->removeElement($favorite);
 
         return $this;
     }

@@ -42,6 +42,13 @@ class Application
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $updatedAt = null;
 
+    public function __construct(User $user, Job $job)
+    {
+        $this->applicant = $user;
+        $this->job = $job;
+        $this->status = self::APPLICATION_STATUS_PENDING;
+    }
+
     public function getId(): ?int
     {
         return $this->id;

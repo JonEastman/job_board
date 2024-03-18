@@ -9,12 +9,8 @@
     </style>
 
     <div class="example-wrapper">
-        <h1>Hello {{ controller_name }}! ✅</h1>
+        <h1>Hello {{ user.firstName }} ✅</h1>
 
-        This friendly message is coming from:
-        <ul>
-            <li>Your controller at <code>/Users/jeastman/Sites/job_board/src/Controller/UserController.php</code></li>
-            <li>Your template at <code>/Users/jeastman/Sites/job_board/templates/user/index.html.twig</code></li>
-        </ul>
+        {{ form(form) }}
     </div>
 {% endblock %}

@@ -54,4 +54,24 @@ class ApplicationManager
             $emailText
         );
     }
+
+    public function withdrawApplication(Application $application): void
+    {
+        $applicant = $application->getApplicant();
+
+        $application->setStatus(Application::APPLICATION_STATUS_WITHDRAWN);
+
+        $this->entityManager->flush();
+
+        $emailText = sprintf(
+            "Hello %s, This email confirms that your application was withdrawn.",
+            $applicant->getFirstName()
+        );
+
+        // Send "mock" notification
+        $this->notificationManager->sendEmail(
+            $applicant->getEmail(),
+            $emailText
+        );
+    }
 }
