@@ -7,6 +7,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
+#[ORM\HasLifecycleCallbacks()]
 class Application
 {
     const APPLICATION_STATUS_PENDING = 'pending';
@@ -112,6 +113,21 @@ class Application
         $this->status = $status;
 
         return $this;
+    }
+
+    #[ORM\PrePersist()]
+    public function prePersist()
+    {
+        if (!$this->createdAt) {
+            $this->createdAt = new \DateTime();
+            $this->updatedAt = new \DateTime();
+        }
+    }
+
+    #[ORM\PreUpdate()]
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime();
     }
 
     public function getCreatedAt(): ?\DateTimeInterface

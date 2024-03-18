@@ -9,6 +9,7 @@ use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: JobRepository::class)]
+#[ORM\HasLifecycleCallbacks()]
 class Job
 {
     const STATUS_DRAFT = 'draft';
@@ -231,6 +232,21 @@ class Job
         $this->updatedAt = $updatedAt;
 
         return $this;
+    }
+
+    #[ORM\PrePersist()]
+    public function prePersist()
+    {
+        if (!$this->createdAt) {
+            $this->createdAt = new \DateTime();
+            $this->updatedAt = new \DateTime();
+        }
+    }
+
+    #[ORM\PreUpdate()]
+    public function preUpdate()
+    {
+        $this->updatedAt = new \DateTime();
     }
 
     /**
