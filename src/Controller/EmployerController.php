@@ -28,7 +28,7 @@ class EmployerController extends AbstractController
         ]);
     }
 
-    #[Route('/employer/user/profile', name: 'app_employer_profile')]
+    #[Route('/employer/profile', name: 'app_employer_profile')]
     public function profile(): Response
     {
         $user = $this->getUser();
@@ -38,7 +38,7 @@ class EmployerController extends AbstractController
         ]);
     }
 
-    #[Route('/employer/user/profile/edit', name: 'app_employer_profile_edit')]
+    #[Route('/employer/profile/edit', name: 'app_employer_profile_edit')]
     public function editProfile(Request $request, EntityManagerInterface $entityManager): Response
     {
         $user = $this->getUser();
