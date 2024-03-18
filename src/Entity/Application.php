@@ -9,6 +9,11 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\Entity(repositoryClass: ApplicationRepository::class)]
 class Application
 {
+    const APPLICATION_STATUS_PENDING = 'pending';
+    const APPLICATION_STATUS_ACCEPTED = 'accepted';
+    const APPLICATION_STATUS_DECLINED = 'declined';
+    const APPLICATION_STATUS_WITHDRAWN = 'withdrawn';
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
