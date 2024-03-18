@@ -11,10 +11,10 @@
 <div class="example-wrapper">
     <h1>Job Search</h1>
 
-    This friendly message is coming from:
-    <ul>
-        <li>Your controller at <code>/Users/jeastman/Sites/job_board/src/Controller/JobController.php</code></li>
-        <li>Your template at <code>/Users/jeastman/Sites/job_board/templates/job/index.html.twig</code></li>
-    </ul>
+    {% for job in jobs %}
+
+        {{ job.title }}<br/>
+
+    {% endfor %}
 </div>
 {% endblock %}

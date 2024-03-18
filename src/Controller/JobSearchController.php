@@ -6,6 +6,7 @@ use App\Entity\Application;
 use App\Entity\Job;
 use App\Entity\User;
 use App\Form\ApplicationType;
+use App\Repository\JobRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -16,10 +17,10 @@ use Symfony\Component\Routing\Attribute\Route;
 class JobSearchController extends AbstractController
 {
     #[Route('/jobs', name: 'app_job_search')]
-    public function search(Request $request): Response
+    public function search(Request $request, JobRepository $jobRepository): Response
     {
         // Default jobs with pagination
-        $jobs = [];
+        $jobs = $jobRepository->findAll();
 
         $form = null;
 
