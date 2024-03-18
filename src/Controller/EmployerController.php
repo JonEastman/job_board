@@ -2,8 +2,10 @@
 
 namespace App\Controller;
 
+use App\Entity\User;
 use App\Form\CompanyType;
 use App\Form\UserType;
+use App\Repository\JobRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
@@ -13,9 +15,13 @@ use Symfony\Component\Routing\Attribute\Route;
 class EmployerController extends AbstractController
 {
     #[Route('/employer/dashboard', name: 'app_employer_dashboard')]
-    public function dashboard(): Response
+    public function dashboard(JobRepository $jobRepository): Response
     {
-        $jobs = [];
+        /** @var User $user */
+        $user = $this->getUser();
+        $company = $user->getCompany();
+
+        $jobs = $jobRepository->findBy(['company' => $company]);
 
         return $this->render('employer/dashboard.html.twig', [
             'jobs' => $jobs,
